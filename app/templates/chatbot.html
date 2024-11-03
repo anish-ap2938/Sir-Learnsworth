@@ -2,24 +2,161 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Victorian Study App - Chatbot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Link to CSS stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <!-- JavaScript functions -->
     <script>
         function logout() {
             alert("You have been logged out. Please log in again to continue.");
             window.location.href = "{{ url_for('auth.logout') }}";
         }
+
+        function sendMessage() {
+            const messageInput = document.getElementById("chat-input");
+            const message = messageInput.value.trim();
+
+            if (message !== "") {
+                const chatBox = document.getElementById("chat-box");
+
+                const userMessage = document.createElement("p");
+                userMessage.className = "user-message";
+                userMessage.innerText = message;
+                chatBox.appendChild(userMessage);
+
+                // Scroll to the bottom of the chat box
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Disable input and button while waiting for response
+                messageInput.disabled = true;
+                const sendButton = document.getElementById("send-button");
+                sendButton.disabled = true;
+
+                fetch("{{ url_for('chatbot.chat_ui') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error: " + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const botMessage = document.createElement("p");
+                    botMessage.className = "bot-message";
+                    botMessage.innerText = data.response_text || "I'm here to help you!";
+                    chatBox.appendChild(botMessage);
+
+                    // Scroll to the bottom of the chat box
+                    chatBox.scrollTop = chatBox.scrollHeight;
+
+                    // Re-enable input and button
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    messageInput.focus();
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    const errorMessage = document.createElement("p");
+                    errorMessage.className = "bot-message";
+                    errorMessage.innerText = "An error occurred while processing your request.";
+                    chatBox.appendChild(errorMessage);
+
+                    // Scroll to the bottom of the chat box
+                    chatBox.scrollTop = chatBox.scrollHeight;
+
+                    // Re-enable input and button
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    messageInput.focus();
+                });
+
+                messageInput.value = "";
+            }
+        }
+
+        function uploadKnowledgeBase() {
+            const form = document.getElementById("knowledge-form");
+            const formData = new FormData(form);
+
+            fetch("{{ url_for('chatbot.upload_knowledge') }}", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error: " + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const messageElement = document.getElementById("upload-message");
+                if (data.message) {
+                    messageElement.style.display = "block";
+                    messageElement.innerText = data.message;
+                    setTimeout(() => { messageElement.style.display = "none"; }, 3000);
+                } else if (data.error) {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Error uploading knowledge base:", error);
+                alert("An error occurred while uploading the knowledge base.");
+            });
+        }
     </script>
 </head>
 <body>
+    <!-- Navbar -->
     <div class="navbar">
         <a href="{{ url_for('index') }}">🏠 Home</a>
-        <a href="{{ url_for('chatbot.chatbot') }}">Chatbot</a>
-        <a href="{{ url_for('quiz.quiz') }}">Quiz</a>
+        <a href="{{ url_for('chatbot.chat_ui_page') }}">Chatbot</a>
+        <a href="{{ url_for('quiz.quiz_ui') }}">Quiz</a>
         <a href="#" onclick="logout()">Logout</a>
     </div>
-    <!-- Rest of the content -->
+
+    <!-- Container Split -->
+    <div class="container-split">
+        <!-- Left Container (Knowledgebase Setup) -->
+        <div class="left-container">
+            <h2>📝 Knowledgebase Setup</h2>
+            <form id="knowledge-form" onsubmit="event.preventDefault(); uploadKnowledgeBase();" enctype="multipart/form-data">
+                <label for="language-selection">Choose Language:</label>
+                <select id="language-selection" name="language-selection" required>
+                    <option value="" disabled selected>Select Language</option>
+                    <option value="English">English</option>
+                    <option value="Spanish">Spanish</option>
+                </select>
+                
+                <label for="word-limit">Word Limit:</label>
+                <input type="number" id="word-limit" name="word-limit" min="100" max="10000" placeholder="Enter word limit" required>
+                
+                <label for="focus-areas">Areas to Focus On:</label>
+                <textarea id="focus-areas" name="focus-areas" rows="4" placeholder="Enter focus areas"></textarea>
+
+                <!-- PDF Upload Input -->
+                <label for="pdf-upload">Upload PDF(s):</label>
+                <input type="file" id="pdf-upload" name="pdf-upload" accept="application/pdf" multiple>
+
+                <button type="submit" class="submit-btn">Upload Knowledgebase</button>
+                <p id="upload-message" style="display: none; color: green;"></p>
+            </form>
+        </div>
+
+        <!-- Right Container (Chat Interface) -->
+        <div class="right-container">
+            <h2>💬 Chat with Sir Learnsworth</h2>
+            <div id="chat-box" class="chat-box"></div>
+            <input type="text" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key === 'Enter') sendMessage()">
+            <button id="send-button" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
 </body>
 </html>

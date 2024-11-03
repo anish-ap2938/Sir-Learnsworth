@@ -11,15 +11,52 @@
             alert("You have been logged out. Please log in again to continue.");
             window.location.href = "{{ url_for('auth.logout') }}";
         }
+
+        function handleQuizFormSubmit(event) {
+            event.preventDefault();
+            alert("Quiz configuration submitted! Generating your quiz...");
+        }
     </script>
 </head>
 <body>
+    <!-- Navbar -->
     <div class="navbar">
         <a href="{{ url_for('index') }}">🏠 Home</a>
-        <a href="{{ url_for('chatbot.chatbot') }}">Chatbot</a>
-        <a href="{{ url_for('quiz.quiz') }}">Quiz</a>
+        <a href="{{ url_for('chatbot.chat_ui_page') }}">Chatbot</a> <!-- Link to /chat_ui_page -->
+        <a href="{{ url_for('quiz.quiz_ui') }}">Quiz</a>
         <a href="#" onclick="logout()">Logout</a>
     </div>
-    <!-- Rest of the content -->
+
+    <!-- Quiz Configuration Form -->
+    <div class="container">
+        <h1>Configure Your Quiz</h1>
+        <p>Generate a quiz based on your uploaded study materials. Customize your quiz settings below:</p>
+
+        <form id="quiz-form" onsubmit="handleQuizFormSubmit(event)">
+            <label for="num-questions">Number of Questions:</label>
+            <input type="number" id="num-questions" name="num-questions" min="1" max="50" placeholder="Enter number of questions" required>
+            
+            <label for="quiz-language">Language:</label>
+            <select id="quiz-language" name="quiz-language" required>
+                <option value="" disabled selected>Select Language</option>
+                <option value="english">English</option>
+                <option value="spanish">Spanish</option>
+            </select>
+            
+            <label for="quiz-topic">Topic Focus:</label>
+            <input type="text" id="quiz-topic" name="quiz-topic" placeholder="Enter the topic to focus on" required>
+            
+            <button type="submit" class="submit-btn">Generate Quiz</button>
+        </form>
+
+        <!-- Quiz Instructions -->
+        <div class="quiz-instructions">
+            <h2>Instructions:</h2>
+            <p>
+                After configuring the quiz, click "Generate Quiz" to start. You'll receive a series of questions tailored to your focus area 
+                and preferred language.
+            </p>
+        </div>
+    </div>
 </body>
 </html>

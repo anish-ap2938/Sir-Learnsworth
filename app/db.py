@@ -1,13 +1,14 @@
 import os
 from azure.cosmos import CosmosClient, PartitionKey
 from dotenv import load_dotenv
+from app.config.config import config
 
 # Load environment variables
 load_dotenv()
 
 # Retrieve Cosmos DB credentials from environment variables
-cosmos_db_url = os.getenv("COSMOS_DB_URL")
-cosmos_db_key = os.getenv("COSMOS_DB_KEY")
+cosmos_db_url = config.COSMOS_DB_URL
+cosmos_db_key = config.COSMOS_DB_KEY
 
 # Verify that credentials are loaded
 if not cosmos_db_url or not cosmos_db_key:
