@@ -2,26 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Victorian Study App - Homepage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Link to CSS stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
     <script>
         function logout() {
-            alert("You have been logged out. Please log in again to continue.");
             window.location.href = "{{ url_for('auth.logout') }}";
         }
     </script>
 </head>
 <body>
+    <!-- Navbar -->
     <div class="navbar">
         <a href="{{ url_for('index') }}">🏠 Home</a>
-        <a href="{{ url_for('chatbot.chat_ui_page') }}">Chatbot</a> <!-- Link to /chat_ui_page -->
+        <a href="{{ url_for('chatbot.chat_ui_page') }}">Chatbot</a>
         <a href="{{ url_for('quiz.quiz_ui') }}">Quiz</a>
         <a href="#" onclick="logout()">Logout</a>
     </div>
 
+    <!-- Main Content -->
     <div class="container">
+        <!-- Logo Image -->
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Victorian Study App Logo">
+        </div>
+
         <h1>Welcome to the Victorian Study App</h1>
         <p>Journey through learning with Sir Learnsworth, your dedicated study companion.</p>
         <div class="intro-section">
@@ -31,7 +39,8 @@
                 <li>Chat with Sir Learnsworth</li>
                 <li>Create customized quizzes</li>
             </ul>
-            <a href="{{ url_for('chatbot.chat_ui') }}" class="action-button">Start Chatting</a>
+            <!-- Link to 'chatbot.chat_ui_page' -->
+            <a href="{{ url_for('chatbot.chat_ui_page') }}" class="action-button">Start Chatting</a>
         </div>
     </div>
 </body>

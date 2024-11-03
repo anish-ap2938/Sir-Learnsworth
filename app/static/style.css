@@ -266,3 +266,88 @@ button:hover {
     font-size: 1.1em;
     color: #f4e1d2;
 }
+
+.quiz-container {
+    padding: 10px;
+    overflow-y: auto;
+    max-height: 600px;
+}
+
+.quiz-question {
+    background-color: rgba(236, 240, 241, 0.9);
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    animation: fadeInUp 0.5s;
+}
+
+.quiz-question p {
+    font-size: 1.2em;
+    color: #2c3e50; /* Dark text color for question text */
+}
+
+.options-list {
+    list-style: none;
+    padding: 0;
+}
+
+.options-list li {
+    background-color: #ffffff; /* White background for options */
+    color: #2c3e50; /* Dark text color for options */
+    padding: 12px 15px;
+    margin: 8px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    border: 1px solid #bdc3c7; /* Light border for contrast */
+    font-size: 1em;
+}
+
+.options-list li:hover {
+    background-color: #ecf0f1; /* Light gray background on hover */
+}
+
+.options-list li.correct {
+    background-color: #2ecc71; /* Green background for correct answer */
+    color: #ffffff; /* White text color */
+}
+
+.options-list li.incorrect {
+    background-color: #e74c3c; /* Red background for incorrect answer */
+    color: #ffffff; /* White text color */
+}
+
+.quiz-result {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.quiz-result h3 {
+    font-size: 2em;
+    color: #c19a6b;
+}
+
+/* Logo Container */
+/* Logo Container */
+.logo-container {
+    text-align: center;
+    margin: 20px 0; /* Adds margin above and below the logo */
+}
+
+.logo-container img {
+    max-width: 100%;
+    height: auto;
+    width: 200px; /* Adjust the width as needed */
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Victorian Study App - {% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Link to CSS stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+        <a href="{{ url_for('chatbot.chat_ui_page') }}">Chatbot</a>
+        <a href="{{ url_for('quiz.quiz_ui') }}">Quiz</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </div>
+
+    {% block content %}{% endblock %}
+
+    <!-- JavaScript functions -->
+    <script>
+        function logout() {
+            window.location.href = "{{ url_for('auth.logout') }}";
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
