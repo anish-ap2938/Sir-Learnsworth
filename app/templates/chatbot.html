@@ -11,7 +11,6 @@
     <!-- JavaScript functions -->
     <script>
         function logout() {
-            alert("You have been logged out. Please log in again to continue.");
             window.location.href = "{{ url_for('auth.logout') }}";
         }
 
@@ -111,6 +110,130 @@
                 alert("An error occurred while uploading the knowledge base.");
             });
         }
+
+        function generateQuiz() {
+            const numQuestions = document.getElementById("num-questions").value;
+            const difficultyLevel = document.getElementById("difficulty-level").value;
+
+            if (!numQuestions || !difficultyLevel) {
+                alert("Please fill in all quiz settings.");
+                return;
+            }
+
+            const generateButton = document.getElementById("generate-quiz-button");
+            generateButton.disabled = true;
+            generateButton.innerText = "Generating Quiz...";
+
+            fetch("{{ url_for('chatbot.generate_quiz_from_conversation_route') }}", {  // Updated endpoint name
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    num_questions: numQuestions,
+                    difficulty_level: difficultyLevel
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error: " + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    displayQuiz(data.quiz);
+                }
+                generateButton.disabled = false;
+                generateButton.innerText = "Generate Quiz";
+            })
+            .catch(error => {
+                console.error("Error generating quiz:", error);
+                alert("An error occurred while generating the quiz.");
+                generateButton.disabled = false;
+                generateButton.innerText = "Generate Quiz";
+            });
+        }
+
+        function displayQuiz(quizData) {
+            const quizContainer = document.getElementById("quiz-container");
+            quizContainer.innerHTML = "";
+
+            let score = 0;
+
+            quizData.forEach((item, index) => {
+                const questionDiv = document.createElement("div");
+                questionDiv.className = "quiz-question";
+
+                const questionText = document.createElement("p");
+                questionText.innerText = `${index + 1}. ${item.question}`;
+                questionDiv.appendChild(questionText);
+
+                const optionsList = document.createElement("ul");
+                optionsList.className = "options-list";
+
+                item.options.forEach((option) => {
+                    const optionItem = document.createElement("li");
+                    optionItem.innerText = option;
+                    optionItem.dataset.correct = option === item.correct_answer;
+                    optionItem.onclick = function() {
+                        selectOption(this);
+                    };
+                    optionsList.appendChild(optionItem);
+                });
+
+                questionDiv.appendChild(optionsList);
+                quizContainer.appendChild(questionDiv);
+            });
+        }
+
+        function selectOption(selectedOption) {
+            const options = selectedOption.parentElement.children;
+            for (let opt of options) {
+                opt.onclick = null; // Disable clicking after selection
+                if (opt.dataset.correct === "true") {
+                    opt.classList.add("correct");
+                } else {
+                    opt.classList.add("incorrect");
+                }
+            }
+
+            // Update score
+            if (!selectedOption.parentElement.dataset.answered) {
+                if (selectedOption.dataset.correct === "true") {
+                    selectedOption.parentElement.dataset.score = 1;
+                } else {
+                    selectedOption.parentElement.dataset.score = 0;
+                }
+                selectedOption.parentElement.dataset.answered = true;
+            }
+
+            // Check if all questions are answered
+            const allAnswered = document.querySelectorAll('.options-list').length === document.querySelectorAll('.options-list[data-answered="true"]').length;
+
+            if (allAnswered) {
+                displayResult();
+            }
+        }
+
+        function displayResult() {
+            const optionsLists = document.querySelectorAll('.options-list');
+            let totalScore = 0;
+            optionsLists.forEach(list => {
+                totalScore += parseInt(list.dataset.score || 0);
+            });
+
+            const quizResult = document.getElementById("quiz-result");
+            const scoreElement = document.getElementById("score");
+            const totalQuestionsElement = document.getElementById("total-questions");
+
+            scoreElement.innerText = totalScore;
+            totalQuestionsElement.innerText = optionsLists.length;
+
+            quizResult.style.display = "block";
+        }
     </script>
 </head>
 <body>
@@ -122,8 +245,8 @@
         <a href="#" onclick="logout()">Logout</a>
     </div>
 
-    <!-- Container Split -->
-    <div class="container-split">
+    <!-- Container Split into Three Parts -->
+    <div class="container-three">
         <!-- Left Container (Knowledgebase Setup) -->
         <div class="left-container">
             <h2>📝 Knowledgebase Setup</h2>
@@ -150,12 +273,37 @@
             </form>
         </div>
 
-        <!-- Right Container (Chat Interface) -->
-        <div class="right-container">
+        <!-- Middle Container (Chat Interface) -->
+        <div class="middle-container">
             <h2>💬 Chat with Sir Learnsworth</h2>
             <div id="chat-box" class="chat-box"></div>
             <input type="text" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key === 'Enter') sendMessage()">
             <button id="send-button" onclick="sendMessage()">Send</button>
+        </div>
+
+        <!-- Right Container (Quiz Generation) -->
+        <div class="right-container">
+            <h2>📝 Generate Quiz from Conversation</h2>
+            <div class="quiz-settings">
+                <label for="num-questions">Number of Questions:</label>
+                <input type="number" id="num-questions" name="num-questions" min="1" max="50" value="5" required>
+
+                <label for="difficulty-level">Difficulty Level:</label>
+                <select id="difficulty-level" name="difficulty-level" required>
+                    <option value="" disabled selected>Select Difficulty</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+
+                <button id="generate-quiz-button" class="submit-btn" onclick="generateQuiz()">Generate Quiz</button>
+            </div>
+            <div id="quiz-container" class="quiz-container">
+                <!-- Quiz will be dynamically inserted here -->
+            </div>
+            <div id="quiz-result" class="quiz-result" style="display: none;">
+                <h3>Your Score: <span id="score"></span>/<span id="total-questions"></span></h3>
+            </div>
         </div>
     </div>
 </body>

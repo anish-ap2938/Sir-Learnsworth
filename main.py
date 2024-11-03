@@ -1,3 +1,5 @@
+# main.py
+
 from flask import Flask, render_template, redirect, url_for, session
 from flask_cors import CORS
 from app.routes.auth import auth_bp
@@ -11,7 +13,7 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__, template_folder="app/templates", static_folder="app/static", static_url_path="/static")
-app.secret_key = "your_secret_key"  # Required for session management
+app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')  # Use environment variable for secret key
 
 CORS(app)  # Enable CORS for all routes
 

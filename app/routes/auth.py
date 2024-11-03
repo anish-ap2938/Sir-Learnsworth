@@ -1,3 +1,5 @@
+# app/routes/auth.py
+
 from flask import Blueprint, request, jsonify, redirect, url_for, session
 from app.db import users_container
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -15,10 +17,10 @@ def signup():
         parameters=[{"name": "@username", "value": username}],
         enable_cross_partition_query=True
     ))
-    
+
     if existing_user:
         return jsonify({"message": "Username already exists"}), 409
-    
+
     # Hash the password and store user details
     hashed_password = generate_password_hash(password)
     user_data = {
@@ -40,11 +42,12 @@ def login():
         parameters=[{"name": "@username", "value": username}],
         enable_cross_partition_query=True
     ))
-    
+
     if user and check_password_hash(user[0]["password"], password):
         session["logged_in"] = True
+        session["user_id"] = user[0]["id"]  # Store user_id in session
         return redirect(url_for("index"))
-    
+
     return jsonify({"message": "Invalid credentials"}), 401
 
 # Define the logout route
