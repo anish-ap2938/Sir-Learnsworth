@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Victorian Study App - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            // Replace with actual API call to backend for login authentication
+            if (username === "admin" && password === "password123") {
+                window.location.href = "{{ url_for('auth.login') }}";
+            } else {
+                alert("Incorrect username or password. Please try again.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container" id="login-container">
+        <h1>🔑 Login Page</h1>
+        <p>Welcome to the <em>Victorian Study App</em>! Please enter your credentials below to proceed.</p>
+        <form onsubmit="login(); return false;">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Username" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>

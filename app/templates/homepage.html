@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Victorian Study App - Homepage</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        function logout() {
+            alert("You have been logged out. Please log in again to continue.");
+            window.location.href = "{{ url_for('auth.logout') }}";
+        }
+    </script>
+</head>
+<body>
+    <div class="navbar">
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+        <a href="{{ url_for('chatbot.chatbot') }}">Chatbot</a>
+        <a href="{{ url_for('quiz.quiz') }}">Quiz</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </div>
+    <div class="container">
+        <h1>Welcome to Victorian Study App</h1>
+        <p>This app is designed to make learning an enjoyable experience. Organize your study materials, take interactive quizzes, and keep track of your progress with ease. Made by Anish, Arpit, and Aniket.</p>
+    </div>
+</body>
+</html>
